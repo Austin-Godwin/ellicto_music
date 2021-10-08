@@ -1,3 +1,4 @@
+import 'package:ellicto_music_player/data/customTrackShape.dart';
 import 'package:flutter/material.dart';
 
 class MySliderListTile extends StatefulWidget {
@@ -9,9 +10,9 @@ class MySliderListTile extends StatefulWidget {
 }
 
 class _MySliderListTileState extends State<MySliderListTile> {
+  double _slider = 1.0;
   @override
   Widget build(BuildContext context) {
-    double _slider = 1.0;
     return  ListTile(
       contentPadding: EdgeInsets.all(0.0),
       title: Column(
@@ -20,7 +21,7 @@ class _MySliderListTileState extends State<MySliderListTile> {
           Text(
             widget.text,
             style: TextStyle(
-                fontSize: 18.5, color: Colors.white),
+                fontSize: 17.5, color: Colors.white),
           ),
           SliderTheme(
             data: SliderThemeData(
@@ -43,30 +44,8 @@ class _MySliderListTileState extends State<MySliderListTile> {
                   });
                 }),
           ),
-          Divider(
-            indent: 2.0,
-            color: Colors.grey[800],
-            thickness: 1.5,
-          ),
         ],
       ),
     );
-  }
-}
-
-class CustomTrackShape extends RoundedRectSliderTrackShape {
-  Rect getPreferredRect({
-    required RenderBox parentBox,
-    Offset offset = Offset.zero,
-    required SliderThemeData sliderTheme,
-    bool isEnabled = false,
-    bool isDiscrete = false,
-  }) {
-    final double? trackHeight = sliderTheme.trackHeight! / 2.5;
-    final double trackLeft = offset.dx;
-    final double trackTop =
-        offset.dy + (parentBox.size.height - trackHeight!) / 1.5;
-    final double trackWidth = parentBox.size.width;
-    return Rect.fromLTWH(trackLeft, trackTop, trackWidth, trackHeight);
   }
 }
