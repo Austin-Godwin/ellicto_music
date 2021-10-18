@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class MyTextListTIle extends StatelessWidget {
   final String titleText;
   final String subtitleText;
-  const MyTextListTIle({Key? key, required this.titleText, required this.subtitleText}) : super(key: key);
+  VoidCallback? onTap;
+  MyTextListTIle({Key? key, required this.titleText, required this.subtitleText, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      onTap: onTap,
       contentPadding: EdgeInsets.all(0.0),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

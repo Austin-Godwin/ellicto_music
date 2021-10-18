@@ -1,13 +1,19 @@
 import 'package:ellicto_music_player/data/divider.dart';
+import 'package:ellicto_music_player/screens/sleepTimerScreen.dart';
 import 'package:ellicto_music_player/widgets/reusableSingleSwitchListTIle.dart';
 import 'package:ellicto_music_player/widgets/reusableSwitchListTile.dart';
 import 'package:ellicto_music_player/widgets/reusableSliderListTIle.dart';
 import 'package:ellicto_music_player/widgets/reusableTextListTile.dart';
 import 'package:flutter/material.dart';
 
-class PlayBack extends StatelessWidget {
+class PlayBack extends StatefulWidget {
   const PlayBack({Key? key}) : super(key: key);
 
+  @override
+  State<PlayBack> createState() => _PlayBackState();
+}
+
+class _PlayBackState extends State<PlayBack> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -34,7 +40,12 @@ class PlayBack extends StatelessWidget {
               children: [
                 MyTextListTIle(
                   titleText: 'Sleep timer',
-                  subtitleText: 'Off'
+                  subtitleText: 'Off',
+                  onTap: () {
+                    setState(() {
+                      Navigator.of(context).pushNamed(SleepTimerScreen.route);
+                    });
+                  },
                 ),
                 MyDivider(),
                 Padding(

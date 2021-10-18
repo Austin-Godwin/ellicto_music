@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:ellicto_music_player/utils/files.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:ellicto_music_player/widgets/reusableCard.dart';
 import 'package:ellicto_music_player/widgets/reusableClipRect.dart';
 import 'package:ellicto_music_player/widgets/reusableIconButtonWidget.dart';
@@ -25,20 +22,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   final ellictoMusic = AssetsAudioPlayer();
 
   void openAudio() async{
-    final audioFile = Files.getFile();
-    await ellictoMusic.open(Audio.file(audioFile.toString()));
+    final audioFile = await Files.getFile();
+    // await ellictoMusic.open(Audio.file(audioFile.toString()));
+    // await ellictoMusic.open(Audio.file());
   }
-
-  // getMusic() async{
-  //   Directory dir = Directory("/storage/emulator/0");
-  //   List<FileSystemEntity> files = dir.listSync();
-  //
-  //   for (FileSystemEntity file in files) {
-  //     Uri dat = file.uri;
-  //
-  //     print(dat);
-  //   }
-  // }
 
   // @override
   // void initState() {
@@ -64,8 +51,6 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             MyPopup()
           ],
           bottom: TabBar(
-            // labelStyle: TextStyle(color: Colors.indigo),
-            // unselectedLabelStyle: TextStyle(color: Colors.indigo),
             tabs: [
               MyTextWidget(
                   marginLeft: MediaQuery.of(context).size.width / 2.5,

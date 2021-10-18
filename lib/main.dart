@@ -1,6 +1,7 @@
 import 'package:ellicto_music_player/screens/audioScreen.dart';
 import 'package:ellicto_music_player/screens/musicPlayerScreen.dart';
 import 'package:ellicto_music_player/screens/settingsScreen.dart';
+import 'package:ellicto_music_player/screens/sleepTimerScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:ellicto_music_player/color/colors.dart';
 
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
       home: MusicPlayerScreen(),
       routes: {
         AudioScreen.route:(BuildContext context) => AudioScreen(),
-        SettingsScreen.route:(BuildContext context) => SettingsScreen()
+        SettingsScreen.route:(BuildContext context) => SettingsScreen(),
+        SleepTimerScreen.route:(BuildContext context) => SleepTimerScreen()
       },
     );
   }

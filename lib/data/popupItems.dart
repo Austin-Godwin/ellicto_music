@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:ellicto_music_player/model/popupItem.dart';
 
 class PopupItems {
