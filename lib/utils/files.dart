@@ -7,7 +7,7 @@ class Files {
     List<FileSystemEntity> allFiles = [];
     List contents = [];
     List contentsDir = [];
-    Map<String, List> data = Map<String, List>();
+    Map<String, List> fileData = Map<String, List>();
 
     final status = await Permission.storage.status;
     if (!status.isGranted) {
@@ -57,9 +57,9 @@ class Files {
     print(contents.length);
     print(contentsDir.length);
 
-    data.addAll({"fileData": contents, "fileFolders": contentsDir});
+    fileData.addAll({"fileData": contents, "fileFolders": contentsDir});
 
-    print(data);
-    return data;
+    print(fileData);
+    return fileData;
   }
 }

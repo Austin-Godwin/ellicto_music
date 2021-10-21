@@ -1,4 +1,5 @@
 import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:ellicto_music_player/data/TracksList.dart';
 import 'package:ellicto_music_player/utils/files.dart';
 import 'package:ellicto_music_player/widgets/reusableCard.dart';
 import 'package:ellicto_music_player/widgets/reusableClipRect.dart';
@@ -20,12 +21,6 @@ class MusicPlayerScreen extends StatefulWidget {
 class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   final bool hasLoaded = false;
   final ellictoMusic = AssetsAudioPlayer();
-
-  void openAudio() async{
-    final audioFile = await Files.getFile();
-    // await ellictoMusic.open(Audio.file(audioFile.toString()));
-    // await ellictoMusic.open(Audio.file());
-  }
 
   // @override
   // void initState() {
@@ -75,7 +70,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ClipRRect(
               borderRadius: BorderRadius.circular(30.0),
               child: Container(
-                color: Colors.grey[900],
+                color: Colors.white10,
                 child: TabBarView(
                   // physics: PageScrollPhysics(),
                   children: [
@@ -100,12 +95,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                         ),
                       ),
                     ),
-                    Center(
-                      child: MyClipRect(
+                    MyClipRect(
+                      child: hasLoaded ? Center(
                         child: CircularProgressIndicator(
-                          color: Colors.white,
+                          color: Colors.red,
                         ),
-                      ),
+                      ) : Tracks(),
                     ),
                     Center(
                       child: MyClipRect(
