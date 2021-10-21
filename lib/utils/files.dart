@@ -2,64 +2,65 @@ import 'dart:async';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
-class Files {
-  static Future getFile() async {
-    List<FileSystemEntity> allFiles = [];
-    List contents = [];
-    List contentsDir = [];
-    Map<String, List> fileData = Map<String, List>();
+const String ROOT = "/storage/emulated/0";
+// const String ROOT = "/storage/emulated/0/";
 
+const List<String> Extensions = ['mp3', 'aac', 'ogg', 'm4a', 'flac'];
+
+class Files {
+  Future<void> requestPermission() async {
     final status = await Permission.storage.status;
     if (!status.isGranted) {
       await Permission.storage.request();
     }
+  }
 
-    Directory dir = Directory("/storage/emulated/0/");
-    List<FileSystemEntity> files = dir.listSync();
+  Future<List<List<FileSystemEntity>>> getDocs([String? path]) async {
+    await requestPermission();
 
-    Directory androidData =Directory("/storage/emulated/0/Android/media/com.whatsapp");
-    List<FileSystemEntity> androidMediaFiles = androidData.listSync(recursive: true);
+    Directory dir = Directory(path ?? ROOT);
 
-    files.addAll(androidMediaFiles);
+    List<List<FileSystemEntity>> files = getFiles(dir);
 
-    for (FileSystemEntity file in files) {
-      // FileManager.getStorageList();
-      String dat = file.path;
+// this contains two
+    return files;
+  }
 
-      if (!dat.endsWith("Android")) {
-        allFiles.add(file);
+  String getName(FileSystemEntity doc) {
+    return doc.path.split("/").last.trim();
+  }
+
+  bool isFile(FileSystemEntity doc) {
+    final type = doc.statSync().type;
+
+    return type == FileSystemEntityType.file;
+  }
+
+  bool isMusicFile(FileSystemEntity doc) {
+    final type = doc.statSync().type;
+    final extension = doc.path.trim().split(".").last.toLowerCase();
+    return type == FileSystemEntityType.file && Extensions.contains(extension);
+  }
+
+  bool isDirectory(FileSystemEntity doc) {
+    final type = doc.statSync().type;
+
+    return type == FileSystemEntityType.directory;
+  }
+
+  List<List<FileSystemEntity>> getFiles(Directory dir) {
+    final List<FileSystemEntity> musics = [];
+    final List<FileSystemEntity> folders = [];
+    final list = dir.listSync();
+    list.forEach((doc) {
+      if (isMusicFile(doc)) {
+        print("Found file ${doc.path}");
+        musics.add(doc);
+      } else if (isDirectory(doc)) {
+        print("Found Directory ${doc.path}");
+        folders.add(doc);
       }
-    }
-
-    for (FileSystemEntity file in allFiles) {
-      if(file.statSync().type == FileSystemEntityType.file && (file.path.endsWith(".mp3") || file.path.endsWith('.aac') || file.path.endsWith('.ogg') || file.path.endsWith('.m4a') || file.path.endsWith('.flac')) ) {
-        contents.add(file.path);
-      }
-      if (file.statSync().type == FileSystemEntityType.directory) {
-        String dat = file.path;
-
-        Directory dir2 = Directory(dat);
-        List<FileSystemEntity> files2 = dir2.listSync(recursive: true);
-
-        for (FileSystemEntity newFile in files2) {
-          String dat = newFile.path;
-          if (dat.endsWith('.mp3') || dat.endsWith('.aac') || dat.endsWith('.ogg') || dat.endsWith('.m4a') || dat.endsWith('.flac')) {
-            contents.add(dat);
-
-            if(!contentsDir.contains(newFile.parent.path)) {
-              contentsDir.add(newFile.parent.path);
-            }
-          }
-        }
-      }
-    }
-
-    print(contents.length);
-    print(contentsDir.length);
-
-    fileData.addAll({"fileData": contents, "fileFolders": contentsDir});
-
-    print(fileData);
-    return fileData;
+    });
+    return [folders, musics];
   }
 }
