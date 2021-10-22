@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:ellicto_music_player/widgets/reusableIconButtonWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,36 @@ class AudioScreen extends StatefulWidget {
 
 class _AudioScreenState extends State<AudioScreen> {
   double _slider = 1.0;
+
+  Uri? audioFile;
+  final player = AssetsAudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      audioFile ??= ModalRoute.of(context)!.settings.arguments as Uri;
+      start();
+    });
+  }
+
+  void start() {
+    if (audioFile != null) {
+      player.open(
+        Audio.file(audioFile!.path,
+            metas: Metas(title: audioFile!.path.split('/').last)),
+      );
+      player.play();
+    }
+  }
+
+  @override
+  void dispose() {
+    player.stop();
+    player.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

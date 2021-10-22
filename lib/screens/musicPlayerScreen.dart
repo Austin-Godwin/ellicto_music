@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:ellicto_music_player/data/TracksList.dart';
+import 'package:ellicto_music_player/screens/audioScreen.dart';
 import 'package:ellicto_music_player/utils/files.dart';
 import 'package:ellicto_music_player/widgets/reusableCard.dart';
 import 'package:ellicto_music_player/widgets/reusableClipRect.dart';
@@ -22,12 +25,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
   final bool hasLoaded = false;
   final ellictoMusic = AssetsAudioPlayer();
 
-  // @override
-  // void initState() {
-  //   // TODO: implement initState
-  //   Files.getFile();
-  //   super.initState();
-  // }
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -76,9 +79,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                   children: [
                     Center(
                       child: MyClipRect(
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                        ),
+                        child: ListOfFiles(),
                       ),
                     ),
                     Center(
@@ -96,11 +97,13 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                       ),
                     ),
                     MyClipRect(
-                      child: hasLoaded ? Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.red,
-                        ),
-                      ) : Tracks(),
+                      child: hasLoaded
+                          ? Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.red,
+                              ),
+                            )
+                          : Tracks(),
                     ),
                     Center(
                       child: MyClipRect(
@@ -118,9 +121,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
                     ),
                     Center(
                       child: MyClipRect(
-                        child: hasLoaded ? CircularProgressIndicator(
-                          color: Colors.white,
-                        ) : Container(width: 100.0, height: 100.0, color: Colors.red,),
+                        child: hasLoaded
+                            ? CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : Container(
+                                width: 100.0,
+                                height: 100.0,
+                                color: Colors.red,
+                              ),
                       ),
                     ),
                   ],
@@ -129,6 +138,96 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen> {
             ),
             MyCard()
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class ListOfFiles extends StatefulWidget {
+  ListOfFiles({Key? key}) : super(key: key);
+
+  @override
+  State<ListOfFiles> createState() => _ListOfFilesState();
+}
+
+class _ListOfFilesState extends State<ListOfFiles> {
+  final explorer = Files();
+
+  List<FileSystemEntity> foldersAndMusic = [];
+
+  bool isLoading = true;
+  bool canGoBack = false;
+
+  void onMusicClick(FileSystemEntity music) {
+    Navigator.of(context).pushNamed(AudioScreen.route, arguments: music.uri);
+  }
+
+  void openFolder([FileSystemEntity? music]) async {
+    setState(() {
+      isLoading = true;
+    });
+    final result = await explorer.getDocs(music != null ? music.path : null);
+    setState(() {
+      canGoBack = music == null ? false : ROOT != music.path;
+      foldersAndMusic = [...result[0], ...result[1]];
+      isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    openFolder();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (canGoBack) {
+          openFolder(foldersAndMusic.first.parent.parent);
+        }
+        return false;
+      },
+      child: Container(
+        child: ListView.builder(
+          itemCount: foldersAndMusic.length,
+          itemBuilder: (BuildContext context, int index) {
+            final doc = foldersAndMusic[index];
+
+            if (explorer.isDirectory(doc)) {
+              return ListTile(
+                onTap: () => openFolder(doc),
+                tileColor: Colors.white,
+                title: Text(explorer.getName(doc)),
+                leading: Container(
+                    color: Colors.blue,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        Icons.folder,
+                        color: Colors.white,
+                      ),
+                    )),
+              );
+            }
+
+            return ListTile(
+              onTap: () => onMusicClick(doc),
+              tileColor: Colors.white,
+              title: Text(explorer.getName(doc)),
+              leading: Container(
+                  color: Colors.blue,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.music_note,
+                      color: Colors.white,
+                    ),
+                  )),
+            );
+          },
         ),
       ),
     );
