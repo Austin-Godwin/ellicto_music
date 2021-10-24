@@ -154,7 +154,7 @@ class ListOfFiles extends StatefulWidget {
 class _ListOfFilesState extends State<ListOfFiles> {
   final explorer = Files();
 
-  List<FileSystemEntity> foldersAndMusic = [];
+  List<FileSystemEntity> musics = [];
 
   bool isLoading = true;
   bool canGoBack = false;
@@ -163,14 +163,15 @@ class _ListOfFilesState extends State<ListOfFiles> {
     Navigator.of(context).pushNamed(AudioScreen.route, arguments: music.uri);
   }
 
-  void openFolder([FileSystemEntity? music]) async {
+  void scanForMusic() async {
     setState(() {
       isLoading = true;
     });
-    final result = await explorer.getDocs(music != null ? music.path : null);
+
+    final result = await explorer.getDocs();
+
     setState(() {
-      canGoBack = music == null ? false : ROOT != music.path;
-      foldersAndMusic = [...result[0], ...result[1]];
+      musics = result;
       isLoading = false;
     });
   }
@@ -178,57 +179,32 @@ class _ListOfFilesState extends State<ListOfFiles> {
   @override
   void initState() {
     super.initState();
-    openFolder();
+    scanForMusic();
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        if (canGoBack) {
-          openFolder(foldersAndMusic.first.parent.parent);
-        }
-        return false;
-      },
-      child: Container(
-        child: ListView.builder(
-          itemCount: foldersAndMusic.length,
-          itemBuilder: (BuildContext context, int index) {
-            final doc = foldersAndMusic[index];
+    return Container(
+      child: ListView.builder(
+        itemCount: musics.length,
+        itemBuilder: (BuildContext context, int index) {
+          final doc = musics[index];
 
-            if (explorer.isDirectory(doc)) {
-              return ListTile(
-                onTap: () => openFolder(doc),
-                tileColor: Colors.white,
-                title: Text(explorer.getName(doc)),
-                leading: Container(
-                    color: Colors.blue,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(
-                        Icons.folder,
-                        color: Colors.white,
-                      ),
-                    )),
-              );
-            }
-
-            return ListTile(
-              onTap: () => onMusicClick(doc),
-              tileColor: Colors.white,
-              title: Text(explorer.getName(doc)),
-              leading: Container(
-                  color: Colors.blue,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.music_note,
-                      color: Colors.white,
-                    ),
-                  )),
-            );
-          },
-        ),
+          return ListTile(
+            onTap: () => onMusicClick(doc),
+            tileColor: Colors.white,
+            title: Text(explorer.getName(doc)),
+            leading: Container(
+                color: Colors.blue,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    Icons.music_note,
+                    color: Colors.white,
+                  ),
+                )),
+          );
+        },
       ),
     );
   }

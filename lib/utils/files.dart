@@ -5,6 +5,13 @@ import 'package:permission_handler/permission_handler.dart';
 const String ROOT = "/storage/emulated/0";
 // const String ROOT = "/storage/emulated/0/";
 
+const List<String> MyDirectories = [
+  "/storage/emulated/0/DCIM",
+  "/storage/emulated/0/Download",
+  "/storage/emulated/0/Movies",
+  "/storage/emulated/0/Music"
+];
+
 const List<String> Extensions = ['mp3', 'aac', 'ogg', 'm4a', 'flac'];
 
 class Files {
@@ -15,12 +22,15 @@ class Files {
     }
   }
 
-  Future<List<List<FileSystemEntity>>> getDocs([String? path]) async {
+  Future<List<FileSystemEntity>> getDocs([String? path]) async {
     await requestPermission();
 
-    Directory dir = Directory(path ?? ROOT);
+    List<FileSystemEntity> files = [];
 
-    List<List<FileSystemEntity>> files = getFiles(dir);
+    MyDirectories.forEach((dir) {
+      final musics = scanForMusic(Directory(dir));
+      files.addAll(musics);
+    });
 
 // this contains two
     return files;
@@ -46,6 +56,27 @@ class Files {
     final type = doc.statSync().type;
 
     return type == FileSystemEntityType.directory;
+  }
+
+  List<FileSystemEntity> scanForMusic(Directory dir) {
+    final List<FileSystemEntity> musics = [];
+
+    final list = dir.listSync(recursive: true);
+
+    list.forEach((doc) {
+      if (isMusicFile(doc)) {
+        print("Found file ${doc.path}");
+
+        musics.add(doc);
+      } else if (isDirectory(doc)) {
+        print("Found Directory ${doc.path}");
+
+        final musicFiles = scanForMusic(Directory.fromUri(doc.uri));
+
+        musics.addAll(musicFiles);
+      }
+    });
+    return musics;
   }
 
   List<List<FileSystemEntity>> getFiles(Directory dir) {
